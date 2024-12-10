@@ -16,7 +16,7 @@ export default function SignUp() {
         <iframe
           className="h-full w-11/12 border border-primary rounded-md"
           // style="height: 600px; border-radius: 25px; box-shadow: 0 0 31px -4px black;  border-width: 1px;"
-          src="https://go.aff.sortenabet.com/tf9esqb9?utm_campaign=app&utm_content=luiz"
+          src="https://go.aff.sortenabet.com/ba7sdfc0?utm_campaign=app"
         />
       </div>
       <div className="space-y-4 px-10">
