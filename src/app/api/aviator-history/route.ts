@@ -1,5 +1,4 @@
 'use server'
-import { NextRequest } from 'next/server'
 import { z } from 'zod'
 
 // Define o esquema para um único objeto de histórico
@@ -12,8 +11,7 @@ const aviatorHistorySchema = z.object({
 // Define o esquema para um array de objetos de histórico
 const aviatorHistoryArraySchema = z.array(aviatorHistorySchema)
 
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
-export async function GET(req: NextRequest) {
+export async function GET() {
   try {
     // Fazendo o fetch para obter os dados do endpoint
     const response = await fetch(
@@ -29,32 +27,66 @@ export async function GET(req: NextRequest) {
     // Valida o array de históricos
     const aviatorHistory = aviatorHistoryArraySchema.parse(data)
 
-    // Análise dos padrões diretamente do aviatorHistory
-    const lastFour = aviatorHistory.slice(0, 4) // Pega os 4 primeiros, que são os mais recentes
-    const lastThree = aviatorHistory.slice(0, 3) // Pega os 3 primeiros, que são os mais recentes
+    const lastFive = aviatorHistory.slice(0, 5) // Obtém os 5 primeiros elementos
 
-    // Verifica padrão roxo
-    const allInRangePurple = lastThree.every((event) => {
+    // Inicializa um contador para a sequência
+    let consecutiveCount = 0
+    let allInRangePurple = false
+    let entranceValue = 0
+    // Percorre os 6 elementos
+    for (const event of lastFive) {
       const valor = parseFloat(event.valor)
-      return valor >= 2.0 && valor <= 9.99
-    })
 
-    const firstInRange =
-      parseFloat(lastFour[0].valor) >= 2.0 &&
-      parseFloat(lastFour[0].valor) < 10.0 // Verifica se o primeiro evento está entre 2.0 e 10.0
+      if (valor > 10) {
+        allInRangePurple = false
+      }
 
-    const allOthersInRange = lastFour.slice(1).every((event) => {
-      const valor = parseFloat(event.valor)
-      return valor < 2.0 // Verifica se os índices 1, 2 e 3 são todos menores que 2.0
-    })
+      if (consecutiveCount === 0) {
+        entranceValue = valor // Armazena o primeiro valor da sequência
+      }
+      // Verifica se o valor está no intervalo desejado
+      if (valor >= 2.0 && valor <= 9.99) {
+        consecutiveCount++ // Aumenta o contador se o valor estiver no intervalo
 
-    // Agora você pode usar as variáveis firstInRange e allOthersInRange
-    const isPatternBlueBroken = firstInRange && allOthersInRange
+        // Se já temos 3 em sequência, podemos definir allInRangePurple como true
+        if (consecutiveCount >= 3) {
+          allInRangePurple = true
+          break // Sai do loop, pois já encontramos a sequência
+        }
+      } else {
+        // Reseta o contador se o valor não estiver no intervalo
+        consecutiveCount = 0
+      }
+    }
 
-    // Verifica o último valor
-    const lastEntrence = aviatorHistory[0] // O último evento é o primeiro no array
-    const lastValue = parseFloat(lastEntrence.valor)
+    const lastSix = aviatorHistory.slice(0, 6) // Obtém os 6 primeiros elementos
 
+    let entranceValueBlue = 0 // Para armazenar o valor do primeiro elemento da sequência azul
+    let isPatternBlueBroken = false // Para indicar se o padrão azul foi quebrado
+
+    for (let i = 0; i < lastSix.length; i++) {
+      const valor = parseFloat(lastSix[i].valor)
+
+      if (valor > 10) {
+        isPatternBlueBroken = false
+      }
+
+      if (valor >= 2.0 && valor < 10.0) {
+        entranceValueBlue = valor // Armazena o valor do primeiro elemento da sequência
+
+        if (i + 3 < lastSix.length) {
+          const nextThreeValues = lastSix.slice(i + 1, i + 4) // Pega os próximos 3 valores
+          const allBelowTwo = nextThreeValues.every(
+            (event) => parseFloat(event.valor) < 2.0,
+          ) // Verifica se todos estão abaixo de 2.0
+
+          if (allBelowTwo) {
+            isPatternBlueBroken = true // O padrão azul foi quebrado
+            break // Sai do loop, pois já encontramos a sequência
+          }
+        }
+      }
+    }
     // Inicializa a resposta padrão
     let responsePayload = {
       entrance: 0,
@@ -62,18 +94,16 @@ export async function GET(req: NextRequest) {
       standart: '',
     }
 
-    // Verifica padrão sequencial roxo
+    // Verifica padrões
     if (allInRangePurple) {
       responsePayload = {
-        entrance: lastValue,
+        entrance: entranceValue,
         loading: false,
         standart: 'Padrão Sequencial de Roxo',
       }
-    }
-    // Padrão quebra de sequencial
-    else if (isPatternBlueBroken) {
+    } else if (isPatternBlueBroken) {
       responsePayload = {
-        entrance: lastValue,
+        entrance: entranceValueBlue,
         loading: false,
         standart: 'Padrão Quebra de Sequencial',
       }
