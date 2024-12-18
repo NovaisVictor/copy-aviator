@@ -32,7 +32,7 @@ export default function Live() {
             className="uppercase py-8 w-full font-bold rounded-3xl bg-gradient-to-r from-[#27A7E7] to-[#0E77A9]"
             asChild
           >
-            <Link href={'https://t.me/+GDht0xqX6MIzYWIx'}>
+            <Link href={'https://t.me/+KEUOtAfFASRmNjYx'}>
               <Telegram />
               Clique aqui e entre grupo do telegram
             </Link>
@@ -41,7 +41,7 @@ export default function Live() {
             className="uppercase w-full py-8 font-bold rounded-3xl bg-gradient-to-r from-[#e52dcd] to-[#FCCF40]"
             asChild
           >
-            <Link href={'https://www.instagram.com/luiz100x'}>
+            <Link href={'https://www.instagram.com/eusoumatheusbrito/'}>
               <Instagram />
               Acessar perfil do instagram
             </Link>
@@ -50,7 +50,11 @@ export default function Live() {
             className="uppercase py-8 w-full font-bold rounded-3xl bg-gradient-to-r from-red-700 to-red-500"
             asChild
           >
-            <Link href={'https://youtube.com/@luiz100x?si=HYW1ft2hF4kEIhUf'}>
+            <Link
+              href={
+                'https://www.youtube.com/playlist?list=PLobCVjkB33_Ob9P9YtH7Lz6fOzX3uWG8O'
+              }
+            >
               <Youtube />
               Canal do YouTube
             </Link>
